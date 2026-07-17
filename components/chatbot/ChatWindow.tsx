@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Message from "./Message";
-import TypingIndicator from "./TypingIndicator";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -10,58 +9,46 @@ type ChatMessage = {
 };
 
 export default function ChatWindow() {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      role: "assistant",
-      content: "Hello 👋 Welcome to ChatPilot AI!",
-    },
-  ]);
-
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
 
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({
-      behavior: "smooth",
-    });
-  }, [messages, isTyping]);
-
-  const sendMessage = () => {
+  async function sendMessage() {
     if (!input.trim()) return;
 
-    const userMessage = input;
+    const userMessage: ChatMessage = {
+      role: "user",
+      content: input,
+    };
 
-    setMessages((prev) => [
-      ...prev,
+    const updatedMessages = [...messages, userMessage];
+
+    setMessages(updatedMessages);
+    setInput("");
+
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        messages: updatedMessages,
+      }),
+    });
+
+    const data = await response.json();
+
+    setMessages([
+      ...updatedMessages,
       {
-        role: "user",
-        content: userMessage,
+        role: "assistant",
+        content: data.message,
       },
     ]);
-
-    setInput("");
-    setIsTyping(true);
-
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content:
-            "🤖 This is a dummy AI response. Real AI will be connected on Day 4.",
-        },
-      ]);
-
-      setIsTyping(false);
-    }, 1000);
-  };
+  }
 
   return (
-    <div className="flex h-full flex-col">
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-8">
+    <div className="flex flex-col gap-4">
+      <div>
         {messages.map((message, index) => (
           <Message
             key={index}
@@ -69,34 +56,26 @@ export default function ChatWindow() {
             content={message.content}
           />
         ))}
-
-        {isTyping && <TypingIndicator />}
-
-        <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <div className="border-t bg-white p-4">
-        <div className="flex gap-3">
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                sendMessage();
-              }
-            }}
-            className="flex-1 rounded-xl border px-4 py-3 outline-none focus:border-blue-500"
-            placeholder="Type your message..."
-          />
-
-          <button
-            onClick={sendMessage}
-            className="rounded-xl bg-blue-600 px-6 py-3 text-white hover:bg-blue-700 transition"
-          >
-            Send
-          </button>
-        </div>
+      <div className="flex gap-2">
+        <input
+  className="border p-2 flex-1"
+  value={input}
+  onChange={(e) => setInput(e.target.value)}
+  onKeyDown={(e) => {
+  if (e.key === "Enter" && input.trim()) {
+    sendMessage();
+  }
+}}
+  placeholder="Ask something..."
+/>
+        <button
+          className="border px-4"
+          onClick={sendMessage}
+        >
+          Send
+        </button>
       </div>
     </div>
   );
