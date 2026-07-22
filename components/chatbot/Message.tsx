@@ -11,18 +11,34 @@ export default function Message({
 
   return (
     <div
-      className={`mb-6 flex ${
+      className={`flex w-full mb-4 ${
         isUser ? "justify-end" : "justify-start"
       }`}
     >
-      <div
-        className={`max-w-[70%] rounded-2xl px-5 py-4 shadow-md ${
-          isUser
-            ? "bg-blue-600 text-white"
-            : "bg-gray-100 text-gray-900"
-        }`}
-      >
-        {content}
+      <div className="flex items-start gap-3 max-w-[80%]">
+
+        {!isUser && (
+          <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-sm">
+            AI
+          </div>
+        )}
+
+        <div
+          className={`px-5 py-3 rounded-2xl text-sm leading-relaxed ${
+            isUser
+              ? "bg-blue-600 text-white rounded-br-none"
+              : "bg-gray-100 text-gray-900 rounded-bl-none"
+          }`}
+        >
+          {content}
+        </div>
+
+        {isUser && (
+          <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm">
+            U
+          </div>
+        )}
+
       </div>
     </div>
   );
