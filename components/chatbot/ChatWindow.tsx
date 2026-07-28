@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Message from "./Message";
 import TypingIndicator from "./TypingIndicator";
 
@@ -9,19 +10,57 @@ type ChatMessage = {
   content: string;
 };
 
-export default function ChatWindow() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [chatId, setChatId] = useState<string | null>(null);
+type Props = {
+  chatId: string | null;
+};
 
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+export default function ChatWindow({
+  chatId: initialChatId,
+}: Props) {
 
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+    const router = useRouter();
+
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [chatId, setChatId] = useState(initialChatId);
+    const [input, setInput] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState("");
+
+    const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+  async function loadChat() {
+    if (!initialChatId) return;
+
+    try {
+      const response = await fetch(
+        `/api/chats/${initialChatId}`
+      );
+
+      if (!response.ok) return;
+
+      const chat = await response.json();
+
+      setMessages(
+        chat.messages.map((message: any) => ({
+          role: message.role,
+          content: message.content,
+        }))
+      );
+
+      setChatId(chat.id);
+
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  loadChat();
+}, [initialChatId]);
 
   async function sendMessage() {
     if (!input.trim() || isLoading) return;
@@ -47,8 +86,12 @@ export default function ChatWindow() {
         }
 
         const chat = await chatResponse.json();
+
         currentChatId = chat.id;
+
         setChatId(chat.id);
+
+        router.push(`/dashboard?chatId=${chat.id}`);
       }
 
       const response = await fetch("/api/chat", {
@@ -89,9 +132,13 @@ export default function ChatWindow() {
     } catch (err) {
       console.error(err);
       setError("⚠️ Something went wrong. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+    } 
+    
+    finally {
+  setIsLoading(false);
+
+  router.refresh();
+}
   }
 
   return (

@@ -26,15 +26,18 @@ export async function POST(req: Request) {
 
   const wh = new Webhook(webhookSecret);
 
-  let event;
+  const event = (() => {
+    try {
+      return wh.verify(payload, svixHeaders) as {
+        type: string;
+        data: any;
+      };
+    } catch {
+      return null;
+    }
+  })();
 
-  try {
-    event = wh.verify(
-      payload,
-      svixHeaders
-    );
-
-  } catch (err) {
+  if (!event) {
     return new NextResponse(
       "Invalid webhook",
       { status: 400 }

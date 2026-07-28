@@ -1,12 +1,19 @@
+"use client";
+
+import { useUser } from "@clerk/nextjs";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default function CTA() {
+  const { isSignedIn } = useUser();
+
   return (
     <section
       id="pricing"
       className="mx-auto max-w-7xl px-6 py-24"
     >
       <div className="rounded-3xl border bg-muted/30 px-8 py-16 text-center">
+
         <h2 className="text-4xl font-bold">
           Ready to Automate Your Customer Support?
         </h2>
@@ -17,11 +24,22 @@ export default function CTA() {
           answer customer questions 24/7.
         </p>
 
-        <div className="mt-8">
-          <Button size="lg">
-            Start Free Trial
-          </Button>
-        </div>
+<div className="mt-8">
+  {!isSignedIn ? (
+    <Link href="/sign-up">
+      <Button size="lg">
+        Start Free Trial
+      </Button>
+    </Link>
+  ) : (
+    <Link href="/dashboard">
+      <Button size="lg">
+        Go to Dashboard
+      </Button>
+    </Link>
+  )}
+</div>
+
       </div>
     </section>
   );

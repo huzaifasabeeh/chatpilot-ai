@@ -12,10 +12,19 @@ model User {
   id        String   @id @default(cuid())
   clerkId   String   @unique
   email     String   @unique
-  name       String?
-  imageUrl   String?
+  name      String?
+  imageUrl  String?
 
   chats     Chat[]
+
+  businessName String?
+  knowledge    String? @db.Text
+
+  // Widget Settings
+  widgetColor    String @default("#2563eb")
+  widgetPosition String @default("right")
+  widgetTitle    String @default("Chat with us")
+  widgetGreeting String @default("Hi 👋 How can I help you today?")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

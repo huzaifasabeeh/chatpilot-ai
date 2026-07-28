@@ -1,6 +1,12 @@
+"use client";
+
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useUser } from "@clerk/nextjs";
 
 export default function Hero() {
+  const { isSignedIn } = useUser();
+  
   return (
     <section className="mx-auto flex max-w-7xl flex-col items-center px-6 py-24 text-center">
       <span className="rounded-full border px-4 py-1 text-sm font-medium">
@@ -19,12 +25,28 @@ export default function Hero() {
       </p>
 
       <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-        <Button size="lg">Get Started</Button>
 
-        <Button variant="outline" size="lg">
-          Live Demo
-        </Button>
-      </div>
+  {!isSignedIn ? (
+    <Link href="/sign-up">
+      <Button size="lg">
+        Get Started
+      </Button>
+    </Link>
+  ) : (
+    <Link href="/dashboard">
+      <Button size="lg">
+        Dashboard
+      </Button>
+    </Link>
+  )}
+
+  <Link href="/dashboard">
+    <Button variant="outline" size="lg">
+      Live Demo
+    </Button>
+  </Link>
+
+</div>
     </section>
   );
 }
