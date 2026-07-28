@@ -1,59 +1,65 @@
 import { NextResponse } from "next/server";
 
-export async function GET(req: Request) {
-  const { origin } = new URL(req.url);
-
+export async function GET() {
   const script = `
 (function () {
 
-  if (document.getElementById("chatpilot-bubble")) return;
+if(document.getElementById("chatpilot-launcher")) return;
 
-  const bubble = document.createElement("div");
+const button=document.createElement("button");
 
-  bubble.id = "chatpilot-bubble";
-  bubble.innerHTML = "💬";
+button.id="chatpilot-launcher";
 
-  bubble.style.position = "fixed";
-  bubble.style.bottom = "24px";
-  bubble.style.right = "24px";
-  bubble.style.width = "64px";
-  bubble.style.height = "64px";
-  bubble.style.borderRadius = "50%";
-  bubble.style.background = "#2563eb";
-  bubble.style.color = "#fff";
-  bubble.style.display = "flex";
-  bubble.style.alignItems = "center";
-  bubble.style.justifyContent = "center";
-  bubble.style.fontSize = "28px";
-  bubble.style.cursor = "pointer";
-  bubble.style.boxShadow = "0 12px 35px rgba(0,0,0,.25)";
-  bubble.style.zIndex = "999999";
+button.innerHTML="💬";
 
-  document.body.appendChild(bubble);
+button.style.position="fixed";
+button.style.bottom="20px";
+button.style.right="20px";
+button.style.width="64px";
+button.style.height="64px";
+button.style.borderRadius="999px";
+button.style.border="none";
+button.style.background="#2563eb";
+button.style.color="white";
+button.style.fontSize="28px";
+button.style.cursor="pointer";
+button.style.zIndex="999999";
+button.style.boxShadow="0 10px 30px rgba(0,0,0,.25)";
 
-  const iframe = document.createElement("iframe");
+const iframe=document.createElement("iframe");
 
-  iframe.src = "${origin}/widget";
+iframe.src=window.location.origin+"/widget";
 
-  iframe.style.position = "fixed";
-  iframe.style.bottom = "100px";
-  iframe.style.right = "24px";
-  iframe.style.width = "380px";
-  iframe.style.height = "600px";
-  iframe.style.border = "none";
-  iframe.style.borderRadius = "20px";
-  iframe.style.boxShadow = "0 12px 35px rgba(0,0,0,.25)";
-  iframe.style.display = "none";
-  iframe.style.zIndex = "999999";
+iframe.style.position="fixed";
+iframe.style.bottom="95px";
+iframe.style.right="20px";
+iframe.style.width="380px";
+iframe.style.height="650px";
+iframe.style.border="none";
+iframe.style.borderRadius="20px";
+iframe.style.boxShadow="0 10px 40px rgba(0,0,0,.3)";
+iframe.style.display="none";
+iframe.style.zIndex="999999";
 
-  document.body.appendChild(iframe);
+button.onclick = () => {
+  iframe.style.display = "block";
+  button.style.display = "none";
+};
 
-  bubble.onclick = function () {
-    iframe.style.display =
-      iframe.style.display === "none"
-        ? "block"
-        : "none";
-  };
+document.body.appendChild(button);
+document.body.appendChild(iframe);
+
+window.addEventListener("message", (event) => {
+
+  if (event.data === "close-chatpilot") {
+
+    iframe.style.display = "none";
+
+    button.style.display = "block";
+
+  }
+
+});
 
 })();
 `;
