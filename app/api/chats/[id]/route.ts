@@ -22,16 +22,15 @@ export async function GET(
 
     const { id } = await params;
 
-    const chat = await db.chat.findUnique({
+    // Scope the lookup to the authenticated Clerk user; an arbitrary chat ID
+    // must never expose another account's conversation and messages.
+    const chat = await db.chat.findFirst({
       where: {
         id,
+        user: { clerkId: userId },
       },
       include: {
-        messages: {
-          orderBy: {
-            createdAt: "asc",
-          },
-        },
+        messages: { orderBy: { createdAt: "asc" } },
       },
     });
 
