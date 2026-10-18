@@ -1,0 +1,1 @@
+"""ChatPilot FastAPI backend."""
