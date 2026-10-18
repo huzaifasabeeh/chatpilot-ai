@@ -39,7 +39,10 @@ export default function Sidebar() {
   }
 
   useEffect(() => {
-    loadChats();
+    void fetch("/api/chats")
+      .then((res) => res.ok ? res.json() : [])
+      .then((data: Chat[]) => setChats(data))
+      .catch((error: unknown) => console.error(error));
   }, []);
 
   async function createChat() {
@@ -86,10 +89,10 @@ export default function Sidebar() {
 }
 
   return (
-    <aside className="flex h-screen w-72 flex-col border-r border-border bg-background">
+    <aside className="sticky top-0 hidden h-screen w-72 shrink-0 flex-col border-r border-slate-200 bg-white md:flex dark:border-white/10 dark:bg-[#0c1729]">
 
       {/* Logo */}
-      <div className="border-b p-6">
+      <div className="border-b border-slate-100 p-6 dark:border-white/10">
         <h1 className="text-2xl font-bold">
           🚀 ChatPilot AI
         </h1>
@@ -123,7 +126,7 @@ export default function Sidebar() {
           {chats.map((chat) => (
             <div
               key={chat.id}
-              className="group flex items-center justify-between rounded-lg hover:bg-gray-100"
+              className="group flex items-center justify-between rounded-lg hover:bg-slate-100 dark:hover:bg-white/10"
             >
               <Link
                 href={`/dashboard?chatId=${chat.id}`}
@@ -155,7 +158,7 @@ export default function Sidebar() {
           className={`flex items-center gap-3 rounded-lg px-4 py-3 transition ${
             pathname === "/dashboard"
               ? "bg-primary/10 text-primary font-semibold"
-              : "hover:bg-gray-100"
+              : "hover:bg-slate-100 dark:hover:bg-white/10"
           }`}
         >
           <MessageSquare size={18} />
@@ -167,7 +170,7 @@ export default function Sidebar() {
           className={`flex items-center gap-3 rounded-lg px-4 py-3 transition ${
             pathname === "/dashboard/knowledge"
               ? "bg-primary/10 text-primary font-semibold"
-              : "hover:bg-gray-100"
+              : "hover:bg-slate-100 dark:hover:bg-white/10"
           }`}
         >
           <BookOpen size={18} />
@@ -179,7 +182,7 @@ export default function Sidebar() {
           className={`flex items-center gap-3 rounded-lg px-4 py-3 transition ${
             pathname === "/dashboard/widget"
               ? "bg-primary/10 text-primary font-semibold"
-              : "hover:bg-gray-100"
+              : "hover:bg-slate-100 dark:hover:bg-white/10"
           }`}
         >
           <Code2 size={18} />
@@ -189,7 +192,7 @@ export default function Sidebar() {
       </nav>
 
       {/* Bottom */}
-      <div className="border-t p-4">
+      <div className="border-t border-slate-100 p-4 dark:border-white/10">
         <div className="mb-4 flex justify-end">
           <ThemeToggle />
         </div>

@@ -18,6 +18,16 @@ export async function POST(req: Request) {
     }
 
     const { messages, chatId } = await req.json();
+    if (!Array.isArray(messages) || messages.length === 0 || messages.length > 40 ||
+        messages.some((m: unknown) => !m || typeof m !== "object" ||
+          !("role" in m) || !("content" in m) ||
+          !["user", "assistant"].includes(String(m.role)) ||
+          typeof m.content !== "string" || m.content.length > 12000)) {
+      return Response.json({ error: "Invalid messages" }, { status: 400 });
+    }
+    if (typeof chatId !== "string" || !chatId) {
+      return Response.json({ error: "A chat ID is required" }, { status: 400 });
+    }
     const user = await db.user.findUnique({
       where: {
         clerkId: userId,
@@ -49,14 +59,17 @@ Rules:
 `;
 
 
-if (chatId && messages.length === 1) {
+const ownedChat = await db.chat.findFirst({
+  where: { id: chatId, userId: user.id },
+  select: { id: true },
+});
+if (!ownedChat) {
+  return Response.json({ error: "Chat not found" }, { status: 404 });
+}
+if (messages.length === 1 && messages[0].role === "user") {
   await db.chat.update({
-    where: {
-      id: chatId,
-    },
-    data: {
-      title: messages[0].content.slice(0, 40),
-    },
+    where: { id: ownedChat.id },
+    data: { title: messages[0].content.slice(0, 40) },
   });
 }
 
