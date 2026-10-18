@@ -30,7 +30,13 @@ export async function POST(req: Request) {
     try {
       return wh.verify(payload, svixHeaders) as {
         type: string;
-        data: any;
+        data: {
+          id: string;
+          email_addresses?: Array<{ email_address: string }>;
+          first_name?: string | null;
+          last_name?: string | null;
+          image_url?: string | null;
+        };
       };
     } catch {
       return null;
@@ -52,10 +58,10 @@ export async function POST(req: Request) {
 
     await createOrUpdateUser({
       clerkId: user.id,
-      email: user.email_addresses[0].email_address,
+      email: user.email_addresses?.[0]?.email_address ?? "",
       name:
         `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim(),
-      imageUrl: user.image_url,
+      imageUrl: user.image_url ?? undefined,
     });
   }
 
