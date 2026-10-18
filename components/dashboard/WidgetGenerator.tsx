@@ -74,9 +74,10 @@ export default function WidgetGenerator() {
 const [embedCode, setEmbedCode] = useState("");
 
 useEffect(() => {
-  setEmbedCode(
-    `<script src="${window.location.origin}/api/widget"></script>`
-  );
+  const frame = window.requestAnimationFrame(() => {
+    setEmbedCode(`<script src="${window.location.origin}/api/widget"></script>`);
+  });
+  return () => window.cancelAnimationFrame(frame);
 }, []);
 
   return (
