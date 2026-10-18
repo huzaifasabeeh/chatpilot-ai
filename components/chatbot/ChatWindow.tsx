@@ -46,7 +46,7 @@ export default function ChatWindow({
       const chat = await response.json();
 
       setMessages(
-        chat.messages.map((message: any) => ({
+        chat.messages.map((message: ChatMessage) => ({
           role: message.role,
           content: message.content,
         }))
