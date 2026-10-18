@@ -16,7 +16,7 @@ class ChatCreate(BaseModel):
 
 class MessageCreate(BaseModel):
     content: str = Field(min_length=1, max_length=12000)
-    role: str = Field(pattern="^(user|assistant)$")
+    role: str = Field(pattern="^user$")
 
 @app.get("/health")
 def health():
