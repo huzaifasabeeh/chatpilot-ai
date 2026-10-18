@@ -39,7 +39,10 @@ export default function Sidebar() {
   }
 
   useEffect(() => {
-    loadChats();
+    void fetch("/api/chats")
+      .then((res) => res.ok ? res.json() : [])
+      .then((data: Chat[]) => setChats(data))
+      .catch((error: unknown) => console.error(error));
   }, []);
 
   async function createChat() {
